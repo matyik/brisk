@@ -3,10 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
 
-	"github.com/dop251/goja"
-	"github.com/evanw/esbuild/pkg/api"
+	"github.com/matyik/brisk/pkg/engine"
+	"github.com/matyik/brisk/pkg/transpiler"
 )
 
 func main() {
@@ -21,41 +20,20 @@ func main() {
 		fmt.Printf("Failed to read file: %v\n", err)
 		os.Exit(1)
 	}
-	code := string(codeBytes)
 
-	if strings.HasSuffix(filePath, ".ts") {
-		result := api.Transform(code, api.TransformOptions{
-			Loader: api.LoaderTS,
-		})
-
-		if len(result.Errors) > 0 {
-			fmt.Println("TypeScript compilation failed:")
-			for _, err := range result.Errors {
-				fmt.Printf("- %s\n", err.Text)
-			}
-			os.Exit(1)
-		}
-		code = string(result.Code)
+	finalCode, err := transpiler.Process(filePath, string(codeBytes))
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
-	vm := goja.New()
-
-	console := vm.NewObject()
-	err = console.Set("log", func(call goja.FunctionCall) goja.Value {
-		var strs []string
-		for _, arg := range call.Arguments {
-			strs = append(strs, arg.String())
-		}
-		fmt.Println(strings.Join(strs, " "))
-		return goja.Undefined()
-	})
+	vm, err := engine.New()
 	if err != nil {
-		panic("Failed to initialize console.log")
+		fmt.Printf("Engine initialization failed: %v\n", err)
+		os.Exit(1)
 	}
-	vm.Set("console", console)
 
-	_, err = vm.RunString(code)
-	if err != nil {
+	if err := vm.Run(finalCode); err != nil {
 		fmt.Printf("Brisk Runtime Error:\n%v\n", err)
 		os.Exit(1)
 	}
