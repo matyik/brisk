@@ -23,6 +23,10 @@ func New() (*VM, error) {
 		return nil, fmt.Errorf("failed to register fetch: %w", err)
 	}
 
+	if err := stdlib.RegisterURL(vm); err != nil {
+		return nil, fmt.Errorf("failed to register URL: %w", err)
+	}
+
 	
 
 	return &VM{runtime: vm}, nil
