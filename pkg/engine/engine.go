@@ -16,8 +16,14 @@ func New() (*VM, error) {
 	vm := goja.New()
 
 	if err := stdlib.RegisterConsole(vm); err != nil {
-		return nil, fmt.Errorf("failed to register standard library: %w", err)
+		return nil, fmt.Errorf("failed to register console: %w", err)
 	}
+
+	if err := stdlib.RegisterFetch(vm); err != nil {
+		return nil, fmt.Errorf("failed to register fetch: %w", err)
+	}
+
+	
 
 	return &VM{runtime: vm}, nil
 }
