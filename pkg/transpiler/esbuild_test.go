@@ -1,41 +1,65 @@
 package transpiler
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
 
-func TestProcess_JavaScript(t *testing.T) {
-	code := "const x = 5;"
-	result, err := Process("test.js", code)
-	
+func TestProcess_BundlesImportsAndStripsTypes(t *testing.T) {
+	tempDir := t.TempDir()
+
+	mathCode := `
+		export function add(a: number, b: number): number {
+			return a + b;
+		}
+	`
+	err := os.WriteFile(filepath.Join(tempDir, "math.ts"), []byte(mathCode), 0644)
 	if err != nil {
-		t.Fatalf("Expected no error for JS file, got: %v", err)
+		t.Fatalf("Failed to write math.ts: %v", err)
 	}
-	if result != code {
-		t.Errorf("Expected JS code to remain unchanged. Got: %s", result)
+
+	indexCode := `
+		import { add } from './math';
+		const result: number = add(5, 10);
+		console.log(result);
+	`
+	indexPath := filepath.Join(tempDir, "index.ts")
+	err = os.WriteFile(indexPath, []byte(indexCode), 0644)
+	if err != nil {
+		t.Fatalf("Failed to write index.ts: %v", err)
+	}
+
+	result, err := Process(indexPath)
+
+	if err != nil {
+		t.Fatalf("Process failed: %v", err)
+	}
+
+	if strings.Contains(result, "number") {
+		t.Errorf("Expected types to be stripped, but 'number' was found in output:\n%s", result)
+	}
+
+	if !strings.Contains(result, "a + b") {
+		t.Errorf("Expected imported math module to be bundled, but logic was missing:\n%s", result)
 	}
 }
 
-func TestProcess_TypeScript(t *testing.T) {
-	code := "const greeting: string = 'hello';"
-	result, err := Process("test.ts", code)
-	
-	if err != nil {
-		t.Fatalf("Expected no error for valid TS file, got: %v", err)
-	}
-	
-	// If the transpiler worked, the word 'string' (the type definition) should be gone
-	if strings.Contains(result, "string") {
-		t.Errorf("Expected TypeScript types to be stripped. Result still contained types: %s", result)
-	}
-}
+func TestProcess_MissingImport(t *testing.T) {
+	tempDir := t.TempDir()
 
-func TestProcess_TypeScript_SyntaxError(t *testing.T) {
-	badCode := "const a: string = ;" // Invalid syntax
-	_, err := Process("test.ts", badCode)
+	badCode := `
+		import { nothing } from './does-not-exist';
+		console.log(nothing);
+	`
 	
+	badPath := filepath.Join(tempDir, "bad.ts")
+	_ = os.WriteFile(badPath, []byte(badCode), 0644)
+
+	_, err := Process(badPath)
+
 	if err == nil {
-		t.Error("Expected an error for malformed TypeScript, but got none")
+		t.Error("Expected an error for a missing import, but got none")
 	}
 }

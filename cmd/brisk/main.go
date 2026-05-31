@@ -15,13 +15,7 @@ func main() {
 	}
 	filePath := os.Args[1]
 
-	codeBytes, err := os.ReadFile(filePath)
-	if err != nil {
-		fmt.Printf("Failed to read file: %v\n", err)
-		os.Exit(1)
-	}
-
-	finalCode, err := transpiler.Process(filePath, string(codeBytes))
+	finalCode, err := transpiler.Process(filePath)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
