@@ -27,6 +27,10 @@ func New() (*VM, error) {
 		return nil, fmt.Errorf("failed to register URL: %w", err)
 	}
 
+	if err := stdlib.RegisterProcess(vm); err != nil {
+		return nil, fmt.Errorf("failed to register process: %w", err)
+	}
+
 	
 
 	return &VM{runtime: vm}, nil
