@@ -10,24 +10,22 @@ import (
 	"github.com/dop251/goja"
 )
 
-func TestRegisterConsole(t *testing.T) {
+func TestConsole_Log(t *testing.T) {
 	vm := goja.New()
-	err := RegisterConsole(vm)
-	if err != nil {
-		t.Fatalf("Failed to register console standard library: %v", err)
-	}
+	config := RuntimeConfig{}
+	LazyInject(vm, config)
 
 	oldStdout := os.Stdout
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	_, err = vm.RunString(`console.log("hello", "brisk", 123)`)
+	_, err := vm.RunString(`console.log("hello", "brisk", 123)`)
 
 	w.Close()
 	os.Stdout = oldStdout
 
 	if err != nil {
-		t.Fatalf("JavaScript execution failed: %v", err)
+		t.Fatalf("JavaScript execution or Module Init failed: %v", err)
 	}
 
 	var buf bytes.Buffer

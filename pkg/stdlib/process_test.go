@@ -14,10 +14,11 @@ func TestProcess_StandardAPIs(t *testing.T) {
 	defer os.Unsetenv(testKey)
 
 	vm := goja.New()
-	err := RegisterProcess(vm)
-	if err != nil {
-		t.Fatalf("Failed to register process: %v", err)
-	}
+	config := RuntimeConfig{}
+	LazyInject(vm, config)
+	// if err != nil {
+	// 	t.Fatalf("Failed to register process: %v", err)
+	// }
 
 	jsCode := `
 		const testVar = process.env.BRISK_TEST_VAR;

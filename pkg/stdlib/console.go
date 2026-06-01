@@ -7,7 +7,8 @@ import (
 	"github.com/dop251/goja"
 )
 
-func RegisterConsole(vm *goja.Runtime) error {
+// InitConsole builds the console object
+func InitConsole(vm *goja.Runtime, config RuntimeConfig) goja.Value {
 	console := vm.NewObject()
 	
 	err := console.Set("log", func(call goja.FunctionCall) goja.Value {
@@ -20,8 +21,8 @@ func RegisterConsole(vm *goja.Runtime) error {
 	})
 	
 	if err != nil {
-		return err
+		panic(vm.NewGoError(err))
 	}
 	
-	return vm.Set("console", console)
+	return console
 }

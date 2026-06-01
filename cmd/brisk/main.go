@@ -21,7 +21,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	vm, err := engine.New()
+	cwd, err := os.Getwd()
+	if err != nil {
+		fmt.Printf("Failed to determine working directory: %v\n", err)
+		os.Exit(1)
+	}
+
+	vm, err := engine.New(cwd)
 	if err != nil {
 		fmt.Printf("Engine initialization failed: %v\n", err)
 		os.Exit(1)

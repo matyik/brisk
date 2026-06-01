@@ -7,7 +7,7 @@ import (
 	"github.com/dop251/goja"
 )
 
-func RegisterProcess(vm *goja.Runtime) error {
+func InitProcess(vm *goja.Runtime, config RuntimeConfig) goja.Value {
 	process := vm.NewObject()
 	
 	env := vm.NewObject()
@@ -39,5 +39,5 @@ func RegisterProcess(vm *goja.Runtime) error {
 		return goja.Undefined()
 	})
 
-	return vm.Set("process", process)
+	return process
 }

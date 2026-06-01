@@ -6,8 +6,8 @@ import (
 	"github.com/dop251/goja"
 )
 
-func RegisterURL(vm *goja.Runtime) error {
-	err := vm.Set("URL", func(call goja.ConstructorCall) *goja.Object {
+func InitURL(vm *goja.Runtime, config RuntimeConfig) goja.Value {
+	urlFn := func(call goja.ConstructorCall) *goja.Object {
 		if len(call.Arguments) == 0 {
 			panic(vm.NewTypeError("Failed to construct 'URL': 1 argument required, but only 0 present."))
 		}
@@ -92,7 +92,7 @@ func RegisterURL(vm *goja.Runtime) error {
 		})
 
 		return instance
-	})
+	}
 
-	return err
+	return vm.ToValue(urlFn)
 }

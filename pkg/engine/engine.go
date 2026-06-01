@@ -1,8 +1,6 @@
 package engine
 
 import (
-	"fmt"
-
 	"github.com/dop251/goja"
 	"github.com/matyik/brisk/pkg/stdlib"
 )
@@ -12,26 +10,14 @@ type VM struct {
 }
 
 // New initializes a fresh VM and binds the standard libraries
-func New() (*VM, error) {
+func New(baseDir string) (*VM, error) {
 	vm := goja.New()
 
-	if err := stdlib.RegisterConsole(vm); err != nil {
-		return nil, fmt.Errorf("failed to register console: %w", err)
+	config := stdlib.RuntimeConfig{
+		SandboxDir: baseDir,
 	}
 
-	if err := stdlib.RegisterFetch(vm); err != nil {
-		return nil, fmt.Errorf("failed to register fetch: %w", err)
-	}
-
-	if err := stdlib.RegisterURL(vm); err != nil {
-		return nil, fmt.Errorf("failed to register URL: %w", err)
-	}
-
-	if err := stdlib.RegisterProcess(vm); err != nil {
-		return nil, fmt.Errorf("failed to register process: %w", err)
-	}
-
-	
+	stdlib.LazyInject(vm, config)
 
 	return &VM{runtime: vm}, nil
 }

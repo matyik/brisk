@@ -8,10 +8,11 @@ import (
 
 func TestURL_ConstructorAndProperties(t *testing.T) {
 	vm := goja.New()
-	err := RegisterURL(vm)
-	if err != nil {
-		t.Fatalf("Failed to register URL: %v", err)
-	}
+	config := RuntimeConfig{}
+	LazyInject(vm, config)
+	// if err != nil {
+	// 	t.Fatalf("Failed to register URL: %v", err)
+	// }
 
 	jsCode := `
 		const u = new URL('https://api.github.com/users/brisk?sort=desc');
@@ -49,7 +50,8 @@ func TestURL_ConstructorAndProperties(t *testing.T) {
 
 func TestURL_SearchParamsMutation(t *testing.T) {
 	vm := goja.New()
-	RegisterURL(vm)
+	config := RuntimeConfig{}
+	LazyInject(vm, config)
 
 	jsCode := `
 		const u = new URL('https://example.com/api?limit=10');
@@ -98,7 +100,8 @@ func TestURL_SearchParamsMutation(t *testing.T) {
 
 func TestURL_ThrowsOnInvalidURL(t *testing.T) {
 	vm := goja.New()
-	RegisterURL(vm)
+	config := RuntimeConfig{}
+	LazyInject(vm, config)
 
 	jsCode := `
 		let caught = false;

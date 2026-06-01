@@ -10,12 +10,10 @@ import (
 )
 
 func TestFetch_AdvancedOptions(t *testing.T) {
-	// Tests with a mock server
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("Expected POST method, got %s", r.Method)
 		}
-
 		if r.Header.Get("User-Agent") != "brisk-test-suite" {
 			t.Errorf("Expected User-Agent 'brisk-test-suite', got %s", r.Header.Get("User-Agent"))
 		}
@@ -27,16 +25,14 @@ func TestFetch_AdvancedOptions(t *testing.T) {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated) // 201 Created
+		w.WriteHeader(http.StatusCreated) 
 		w.Write([]byte(`{"success": true, "id": 99}`))
 	}))
 	defer mockServer.Close() 
 
 	vm := goja.New()
-	err := RegisterFetch(vm)
-	if err != nil {
-		t.Fatalf("Failed to register fetch: %v", err)
-	}
+	config := RuntimeConfig{}
+	LazyInject(vm, config)
 
 	vm.Set("MOCK_URL", mockServer.URL)
 

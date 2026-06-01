@@ -9,8 +9,10 @@ import (
 	"github.com/dop251/goja"
 )
 
-func RegisterFetch(vm *goja.Runtime) error {
-	err := vm.Set("fetch", func(call goja.FunctionCall) goja.Value {
+// InitFetch builds the global fetch function
+func InitFetch(vm *goja.Runtime, config RuntimeConfig) goja.Value {
+	
+	fetchFn := func(call goja.FunctionCall) goja.Value {
 		promise, resolve, reject := vm.NewPromise()
 
 		if len(call.Arguments) == 0 {
@@ -19,8 +21,6 @@ func RegisterFetch(vm *goja.Runtime) error {
 		}
 		
 		url := call.Argument(0).String()
-
-		// default request parameters
 		method := "GET"
 		var bodyReader io.Reader = nil
 		var headers *goja.Object
@@ -31,11 +31,9 @@ func RegisterFetch(vm *goja.Runtime) error {
 			if m := options.Get("method"); m != nil && !goja.IsUndefined(m) {
 				method = strings.ToUpper(m.String())
 			}
-
 			if b := options.Get("body"); b != nil && !goja.IsUndefined(b) {
 				bodyReader = strings.NewReader(b.String())
 			}
-
 			if h := options.Get("headers"); h != nil && !goja.IsUndefined(h) {
 				headers = h.ToObject(vm)
 			}
@@ -49,8 +47,7 @@ func RegisterFetch(vm *goja.Runtime) error {
 
 		if headers != nil {
 			for _, key := range headers.Keys() {
-				val := headers.Get(key).String()
-				req.Header.Set(key, val)
+				req.Header.Set(key, headers.Get(key).String())
 			}
 		}
 
@@ -91,7 +88,7 @@ func RegisterFetch(vm *goja.Runtime) error {
 
 		resolve(responseObj)
 		return vm.ToValue(promise)
-	})
+	}
 
-	return err
+	return vm.ToValue(fetchFn)
 }

@@ -5,7 +5,7 @@ import (
 )
 
 func TestEngine_RunValidJS(t *testing.T) {
-	vm, err := New()
+	vm, err := New(t.TempDir())
 	if err != nil {
 		t.Fatalf("Failed to initialize engine: %v", err)
 	}
@@ -22,7 +22,7 @@ func TestEngine_RunValidJS(t *testing.T) {
 }
 
 func TestEngine_RunInvalidJS(t *testing.T) {
-	vm, err := New()
+	vm, err := New(t.TempDir())
 	if err != nil {
 		t.Fatalf("Failed to initialize engine: %v", err)
 	}
