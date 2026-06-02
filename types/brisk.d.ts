@@ -13,21 +13,22 @@
  * The Brisk-specific HTTP Request object passed to `Brisk.serve` callbacks.
  */
 interface BriskRequest {
-  /** The HTTP Method (e.g., "GET", "POST") */
   method: string;
-  /** The incoming path (e.g., "/api/users") */
   url: string;
-  /** The raw stringified body of the request */
+  /** The raw query string (e.g., "search=term&page=2") */
+  query: string;
   body: string;
+  /** Incoming HTTP headers as a key-value map */
+  headers: Record<string, string>;
 }
 
 /**
  * The expected response format for `Brisk.serve`.
  */
 interface BriskResponse {
-  /** HTTP Status Code (Defaults to 200) */
   status?: number;
-  /** The response payload */
+  /** Outgoing HTTP headers (e.g., { "Content-Type": "application/json" }) */
+  headers?: Record<string, string>;
   body?: string;
 }
 

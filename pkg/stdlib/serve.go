@@ -38,7 +38,16 @@ func InitBrisk(vm *goja.Runtime, config RuntimeConfig) goja.Value {
 			jsReq := vm.NewObject()
 			_ = jsReq.Set("method", r.Method)
 			_ = jsReq.Set("url", r.URL.Path)
+			_ = jsReq.Set("query", r.URL.RawQuery)
 			_ = jsReq.Set("body", string(bodyBytes))
+
+			jsHeaders := vm.NewObject()
+			for k, v := range r.Header {
+				if len(v) > 0 {
+					_ = jsHeaders.Set(k, v[0])
+				}
+			}
+			_ = jsReq.Set("headers", jsHeaders)
 
 			res, err := callback(goja.Undefined(), jsReq)
 			if err != nil {
@@ -53,11 +62,20 @@ func InitBrisk(vm *goja.Runtime, config RuntimeConfig) goja.Value {
 			}
 
 			if resObj, ok := res.(*goja.Object); ok {
+				
+				headersVal := resObj.Get("headers")
+				if headersVal != nil && !goja.IsUndefined(headersVal) {
+					headersObj := headersVal.ToObject(vm)
+					for _, key := range headersObj.Keys() {
+						w.Header().Set(key, headersObj.Get(key).String())
+					}
+				}
+
 				statusVal := resObj.Get("status")
 				if statusVal != nil && !goja.IsUndefined(statusVal) {
 					w.WriteHeader(int(statusVal.ToInteger()))
 				} else {
-					w.WriteHeader(http.StatusOK) // Default 200
+					w.WriteHeader(http.StatusOK) 
 				}
 
 				bodyVal := resObj.Get("body")
@@ -67,7 +85,6 @@ func InitBrisk(vm *goja.Runtime, config RuntimeConfig) goja.Value {
 				return
 			}
 
-			// Fallback: Just stringify whatever they returned
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(res.String()))
 		})
