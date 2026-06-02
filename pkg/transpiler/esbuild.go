@@ -15,6 +15,7 @@ func Process(filePath string) (string, error) {
 		Write:       false,
 		Platform:    api.PlatformNeutral,
 		Format:      api.FormatIIFE,
+		Plugins:     []api.Plugin{NodePolyfillPlugin()},
 	})
 
 	if len(result.Errors) > 0 {

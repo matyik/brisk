@@ -63,3 +63,45 @@ func TestProcess_MissingImport(t *testing.T) {
 		t.Error("Expected an error for a missing import, but got none")
 	}
 }
+
+func TestNodePolyfillPlugin(t *testing.T) {
+	tempDir := t.TempDir()
+	entryPoint := filepath.Join(tempDir, "legacy.ts")
+
+	code := `
+		import fs from 'node:fs';
+		import { randomUUID } from 'crypto';
+		import process from 'process';
+
+		const id = randomUUID();
+		const fileData = fs.readFileSync('test.txt');
+		console.log(process.cwd());
+	`
+	
+	err := os.WriteFile(entryPoint, []byte(code), 0644)
+	if err != nil {
+		t.Fatalf("Failed to write temp file: %v", err)
+	}
+
+	output, err := Process(entryPoint)
+	if err != nil {
+		t.Fatalf("Transpiler crashed! Error: %v", err)
+	}
+
+	
+	if !strings.Contains(output, "globalThis.fs.readFileSync") {
+		t.Errorf("Expected output to contain polyfilled 'globalThis.fs.readFileSync', got:\n%s", output)
+	}
+
+	if !strings.Contains(output, "globalThis.crypto.randomUUID") {
+		t.Errorf("Expected output to contain polyfilled 'globalThis.crypto.randomUUID', got:\n%s", output)
+	}
+
+	if !strings.Contains(output, "globalThis.process") {
+		t.Errorf("Expected output to contain polyfilled 'globalThis.process', got:\n%s", output)
+	}
+
+	if strings.Contains(output, "require('node:fs')") || strings.Contains(output, "require(\"node:fs\")") {
+		t.Errorf("Security Failure: The plugin failed to intercept the Node import. A native 'require' leaked into the bundle!")
+	}
+}

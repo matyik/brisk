@@ -20,3 +20,6 @@
 
 # Build
 dist/
+
+# Generated from examples
+node-test.txt
