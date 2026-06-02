@@ -19,6 +19,7 @@ func Registry() map[string]ModuleFactory {
 		"process": InitProcess,
 		"fs":      InitFS,
 		"crypto":  InitCrypto,
+		"Brisk":   InitBrisk,
 	}
 }
 
