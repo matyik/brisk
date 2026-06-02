@@ -10,7 +10,7 @@ Brisk is cross-compiled and globally distributed. Install it on macOS or Linux w
 
 ```bash
 brew tap matyik/brisk
-brew install brisk
+brew install matyik/brisk/brisk
 ```
 
 **For Windows (PowerShell):**
