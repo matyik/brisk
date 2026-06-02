@@ -8,7 +8,17 @@ import (
 	"github.com/matyik/brisk/pkg/transpiler"
 )
 
+var Version = "dev"
+
 func main() {
+	if len(os.Args) >= 2 {
+		arg := os.Args[1]
+		if arg == "--version" || arg == "-v" {
+			fmt.Printf("Brisk v%s\n", Version)
+			os.Exit(0)
+		}
+	}
+
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: brisk <file.js|file.ts>")
 		os.Exit(1)

@@ -1,0 +1,42 @@
+project_name: brisk
+
+builds:
+  - id: brisk-build
+    main: ./cmd/brisk/main.go
+    binary: brisk
+
+    goos:
+      - linux
+      - windows
+      - darwin
+
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+
+brews:
+  - name: brisk
+
+    repository:
+      owner: matyik
+      name: homebrew-brisk
+      token: '{{ .Env.TAP_GITHUB_TOKEN }}'
+
+    description: 'Ultra-lightweight JavaScript edge runtime.'
+    homepage: 'https://brisk.js.org'
