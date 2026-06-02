@@ -119,22 +119,7 @@ Because Brisk compiles into a single, self-contained statically linked binary wi
 
 ### High-Density Edge Containers
 
-To deploy Brisk across decentralized container platforms (like Fly.io or AWS Fargate Edge), use a minimalist scratch-based `Dockerfile`:
-
-```dockerfile
-# Multi-stage build
-FROM golang:1.22-alpine AS builder
-WORKDIR /app
-COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o brisk ./cmd/brisk/main.go
-
-# Scratch deployment for minimal attack surface and small image size
-FROM scratch
-COPY --from=builder /app/brisk /brisk
-COPY ./server.ts /server.ts
-EXPOSE 3000
-ENTRYPOINT ["/brisk", "/server.ts"]
-```
+To deploy Brisk across decentralized container platforms (like Fly.io or AWS Fargate Edge), use a minimalist scratch-based `Dockerfile` like the one provided.
 
 ---
 

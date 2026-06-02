@@ -5,6 +5,9 @@ builds:
     main: ./cmd/brisk/main.go
     binary: brisk
 
+    ldflags:
+      - -X main.Version={{.Version}}
+
     goos:
       - linux
       - windows
