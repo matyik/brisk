@@ -71,6 +71,20 @@ brisk server.ts
 
 ---
 
+## Compiling Standalone Binaries (SEA)
+
+Brisk allows you to compile your TypeScript or JavaScript application into a single, zero-dependency executable file. The resulting binary can run on any target machine without needing Node.js, Go, or Brisk installed.
+
+To compile a script:
+
+```bash
+brisk compile examples/add.ts
+```
+
+The executable will generate in the `./dist` directory
+
+---
+
 ## TypeScript & Editor Setup
 
 Brisk implements a tailored subset of modern Web and Node interfaces. To prevent VS Code from pulling in conflicting browser definitions (`lib.dom.d.ts`), configure your project as a dedicated serverless environment.
@@ -138,7 +152,7 @@ To deploy Brisk across decentralized container platforms (like Fly.io or AWS Far
 - `crypto.randomUUID(): string`
 - `crypto.getRandomValues(array: TypedArray): TypedArray` _(Max 65,536 bytes parity restriction)_
 
-### `fs` (Sandboxed)
+### `fs`
 
 - `fs.readFileSync(path: string): string`
 - `fs.writeFileSync(path: string, data: string): void`
